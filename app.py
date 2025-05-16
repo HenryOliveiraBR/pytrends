@@ -2,7 +2,9 @@ from flask import Flask, request, jsonify
 from pytrends.request import TrendReq
 
 app = Flask(__name__)
-pytrends = TrendReq(hl='pt-BR', tz=360)
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36'}
+pytrends = TrendReq(hl='pt-BR', tz=360, requests_args={'headers': headers})
+
 
 @app.route('/trends')
 def get_trends():
