@@ -25,5 +25,7 @@ def get_trends():
 
     except Exception as e:
         import traceback
+        print("Erro ao buscar:", termo)
         print(traceback.format_exc())
         return jsonify({"erro": str(e)}), 500
+
