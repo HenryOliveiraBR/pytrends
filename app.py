@@ -6,15 +6,21 @@ pytrends = TrendReq(hl='pt-BR', tz=360)
 
 @app.route('/trends')
 def get_trends():
-    termo = request.args.get('q', '')
+    termo = request.args.get('q')
     if not termo:
-        return jsonify({"erro": "Palavra-chave (q) não fornecida"}), 400
+        return jsonify({"erro": "É necessário passar o parâmetro 'q'"}), 400
 
-    pytrends.build_payload([termo], cat=0, timeframe='now 7-d', geo='BR')
-    dados = pytrends.interest_over_time()
+    try:
+        pytrends.build_payload([termo], timeframe='now 7-d', geo='BR')
+        df = pytrends.interest_over_time()
+        if df.empty:
+            return jsonify([])
 
-    if dados.empty:
-        return jsonify({"erro": "Sem dados para esse termo"}), 404
+        resultados = []
+        for index, row in df.iterrows():
+            resultados.append([index.strftime('%Y-%m-%d'), int(row[termo])])
 
-    resultado = dados[[termo]].reset_index().to_dict(orient='records')
-    return jsonify(resultado)
+        return jsonify(resultados)
+
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
